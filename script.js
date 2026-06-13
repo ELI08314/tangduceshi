@@ -54,34 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
         progressText.textContent = `${answeredCount} / ${quizItems.length}`;
     });
 
-    // 新增：为 label 添加选中样式的同步逻辑（修复点击选项后不显示选中状态的 bug）
-    (function attachRadioLabelSync() {
-        const allRadios = document.querySelectorAll('.options input[type="radio"]');
-        allRadios.forEach(radio => {
-            // 初始同步（比如页面恢复时）
-            const parentLabel = radio.closest('label');
-            if (parentLabel) {
-                if (radio.checked) parentLabel.classList.add('selected');
-                else parentLabel.classList.remove('selected');
-            }
-
-            radio.addEventListener('change', () => {
-                // 对同名组清理所有 label 的 selected 状态
-                document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
-                    const lbl = r.closest('label');
-                    if (lbl) lbl.classList.remove('selected');
-                });
-                // 给被选中的那个 label 加上 selected
-                const lbl = radio.closest('label');
-                if (lbl) lbl.classList.add('selected');
-
-                // 更新进度文本（为了保险，兼容性更好）
-                const answeredCount = document.querySelectorAll('input[type="radio"]:checked').length;
-                progressText.textContent = `${answeredCount} / ${quizItems.length}`;
-            });
-        });
-    })();
-
     // 3. 最终分析逻辑
     analyzeButton.addEventListener('click', () => {
         const quizScore = getQuizScore();
@@ -137,8 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 重置所有状态
         nameInput.value = '';
         document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
-        // 移除所有 label 的 selected 类
-        document.querySelectorAll('.options label.selected').forEach(lbl => lbl.classList.remove('selected'));
         progressText.textContent = `0 / ${quizItems.length}`;
         fallbackShare.classList.remove('active');
         fallbackShare.innerHTML = '';
